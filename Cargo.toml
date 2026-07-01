@@ -1,0 +1,32 @@
+[package]
+name = "codexa"
+version = "0.0.1"
+edition = "2024"
+rust-version = "1.85"
+description = "A Git-native content compiler for building typed public and private knowledge artifacts."
+license = "MIT"
+repository = "https://github.com/orbyts/codexa"
+homepage = "https://github.com/orbyts/codexa"
+documentation = "https://docs.rs/codexa"
+readme = "README.md"
+keywords = ["markdown", "documentation", "publishing", "knowledge", "git"]
+categories = ["command-line-utilities", "development-tools"]
+include = [
+  "src/**",
+  "tests/**",
+  "Cargo.toml",
+  "Cargo.lock",
+  "README.md",
+  "LICENSE",
+  "CHANGELOG.md",
+]
+
+[lib]
+name = "codexa"
+path = "src/lib.rs"
+
+[[bin]]
+name = "codexa"
+path = "src/main.rs"
+
+[dependencies]
