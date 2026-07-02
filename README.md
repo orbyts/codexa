@@ -9,6 +9,14 @@ Version `0.0.1` is the initial internal pre-release scaffold.
 - `0.0.1` through `0.0.9`: internal pre-release development
 - `0.1.0`: first working release
 
+Codexa evolves through small, versioned vertical slices. The package version in
+`Cargo.toml` identifies the active architectural milestone and the capabilities
+that should already be complete.
+
+See [docs/roadmap.md](docs/roadmap.md) for the complete `0.0.1` through `0.1.0`
+development plan, including web rendering, repository aggregation, privacy,
+full-text search, embeddings, and generated contextual views.
+
 ## Current behavior
 
 ```console
