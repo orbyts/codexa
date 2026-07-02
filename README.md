@@ -31,6 +31,7 @@ Git repositories
         ├── Obsidian vault
         ├── search indexes
         ├── Substack exports
+        ├── Notion exports
         └── future targets
 ```
 
@@ -92,6 +93,8 @@ Codexa owns:
 - validation
 - artifact generation
 
+The `0.0.2` web adapter emits a versioned JSON bundle. A separate website repository will consume that bundle.
+
 The website owns:
 
 - HTML components
@@ -133,6 +136,7 @@ renderers
     ├── Obsidian
     ├── search
     ├── Substack
+    ├── Notion
     └── additional targets
 ```
 
@@ -188,6 +192,21 @@ Dynamic functionality may later be layered onto the website for:
 - commerce and paid downloads
 
 Codexa will provide the structured content and product references. Website runtimes and external services will handle transactions, credentials, customer records, and authorization.
+
+## Build the 0.0.2 web artifact
+
+```bash
+cargo run -- build examples/paragraph/document.md --adapter web --output dist/web
+```
+
+The command writes:
+
+```text
+dist/web/
+├── manifest.json
+└── documents/
+    └── sample.json
+```
 
 ## Development
 

@@ -16,17 +16,16 @@ JSON web artifact
 external website renderer
 ```
 
-### Planned
+### Added
 
-- Add a typed `Document` model.
-- Add a `Block` enum.
-- Add the first `Paragraph` block.
-- Parse paragraph-only Markdown.
-- Reject unsupported Markdown constructs with clear diagnostics.
-- Serialize a stable JSON web artifact.
-- Add a `codexa build` command.
-- Add parser, serialization, fixture, and CLI integration tests.
-- Keep website presentation outside the Codexa core.
+- Typed `Document`, `Block`, and `Paragraph` models.
+- Paragraph-only Markdown parsing through `pulldown-cmark`.
+- Stable diagnostics for unsupported Markdown constructs.
+- Versioned JSON web document and manifest artifacts.
+- `codexa build <INPUT> --adapter web --output <DIR>`.
+- Parser, adapter, fixture, and CLI integration tests.
+- CI packaging from a clean checkout.
+- Documentation for future Notion and platform-specific adapters.
 
 
 All notable changes to Codexa will be documented in this file.

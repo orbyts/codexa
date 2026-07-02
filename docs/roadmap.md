@@ -127,7 +127,7 @@ Inline::Text
 - JSON serialization of the normalized document.
 - Versioned web-model artifact.
 - Minimal `codexa build` command.
-- Reference website renderer capable of displaying paragraph blocks.
+- JSON web adapter that emits a versioned bundle for an external website renderer.
 - Clear diagnostics for unsupported Markdown nodes.
 
 ### Initial artifact shape
@@ -156,12 +156,13 @@ SearchMetadata
 - A Markdown paragraph is parsed into a typed `Paragraph`.
 - Two paragraphs preserve source order.
 - The normalized document serializes deterministically.
-- The reference website reads the artifact and renders the paragraph.
+- The generated manifest and document JSON match the documented web contract.
 - Unsupported headings, lists, and code blocks produce stable diagnostic codes.
 - Snapshot tests cover the normalized JSON artifact.
 
 ### Explicitly deferred
 
+- The external website implementation and visual design.
 - Inline formatting beyond plain text.
 - Headings and navigation.
 - Frontmatter.
@@ -827,3 +828,21 @@ Before advancing `Cargo.toml` to the next version:
 ```
 
 The version number should advance only after the current milestone is complete, not when work on that milestone begins.
+---
+
+## `0.1.1` and later — Additional platform adapters
+
+### Goal
+
+Add target-specific projections without changing Git-backed canonical content.
+
+### Candidate adapters
+
+- Notion page and block export.
+- Substack article export.
+- Additional Obsidian projections.
+- RSS, Atom, JSON Feed, and API artifacts.
+- Platform-specific publishing integrations where stable write APIs exist.
+
+Notion and other hosted platforms remain generated destinations. They do not become canonical authoring stores unless a future, separately designed import workflow explicitly supports that behavior.
+

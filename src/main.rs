@@ -1,32 +1,65 @@
-use std::process::ExitCode;
+use std::{fs, path::PathBuf, process::ExitCode};
 
 fn main() -> ExitCode {
-    let mut args = std::env::args().skip(1);
-
-    match args.next().as_deref() {
-        None => {
-            println!("{}", codexa::greeting());
-            ExitCode::SUCCESS
-        }
-        Some("--version" | "-V") => {
-            println!("codexa {}", codexa::VERSION);
-            ExitCode::SUCCESS
-        }
-        Some("--help" | "-h") => {
-            print_help();
-            ExitCode::SUCCESS
-        }
-        Some(argument) => {
-            eprintln!("error: unknown argument `{argument}`\n");
-            print_help();
-            ExitCode::from(2)
+    match run(std::env::args().skip(1).collect()) {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            eprintln!("error: {error}");
+            ExitCode::from(1)
         }
     }
 }
 
+fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
+    match args.as_slice() {
+        [] => {
+            println!("{}", codexa::greeting());
+            Ok(())
+        }
+        [flag] if flag == "--version" || flag == "-V" => {
+            println!("codexa {}", codexa::VERSION);
+            Ok(())
+        }
+        [flag] if flag == "--help" || flag == "-h" => {
+            print_help();
+            Ok(())
+        }
+        [command, input, adapter_flag, adapter, output_flag, output]
+            if command == "build"
+                && adapter_flag == "--adapter"
+                && adapter == "web"
+                && output_flag == "--output" =>
+        {
+            build_web(PathBuf::from(input), PathBuf::from(output))
+        }
+        [command, input, output_flag, output]
+            if command == "build" && output_flag == "--output" =>
+        {
+            build_web(PathBuf::from(input), PathBuf::from(output))
+        }
+        _ => {
+            print_help();
+            Err("invalid arguments".into())
+        }
+    }
+}
+
+fn build_web(input: PathBuf, output: PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+    let markdown = fs::read_to_string(&input)?;
+    let document = codexa::parser::parse_markdown(&markdown)?;
+    let source_name = input
+        .file_name()
+        .and_then(|name| name.to_str())
+        .unwrap_or("document.md");
+
+    codexa::adapter::web::write_artifact(document, source_name, &output)?;
+    println!("Web artifact written to {}", output.display());
+    Ok(())
+}
+
 fn print_help() {
     println!(
-        "Codexa {}\n\nA Git-native content compiler.\n\nUSAGE:\n    codexa [OPTIONS]\n\nOPTIONS:\n    -h, --help       Print help\n    -V, --version    Print version",
+        "Codexa {}\n\nA Git-native content compiler.\n\nUSAGE:\n    codexa [OPTIONS]\n    codexa build <INPUT> [--adapter web] --output <DIR>\n\nOPTIONS:\n    -h, --help       Print help\n    -V, --version    Print version",
         codexa::VERSION
     );
 }

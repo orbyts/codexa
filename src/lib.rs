@@ -1,12 +1,16 @@
 //! Core library for Codexa.
 //!
-//! Codexa will aggregate structured content from Git repositories into a
-//! typed intermediate representation and render it into multiple artifacts.
+//! Codexa aggregates structured content from Git repositories into a typed,
+//! target-neutral model and renders that model through output adapters.
+
+pub mod adapter;
+pub mod model;
+pub mod parser;
 
 /// Current Codexa package version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-/// Returns the initial greeting used by the `0.0.1` scaffold.
+/// Returns the initial greeting retained from the `0.0.1` scaffold.
 #[must_use]
 pub const fn greeting() -> &'static str {
     "Hello from Codexa!"
@@ -22,7 +26,7 @@ mod tests {
     }
 
     #[test]
-    fn version_matches_manifest() {
-        assert_eq!(VERSION, "0.0.1");
+    fn version_comes_from_cargo_manifest() {
+        assert_eq!(VERSION, env!("CARGO_PKG_VERSION"));
     }
 }
