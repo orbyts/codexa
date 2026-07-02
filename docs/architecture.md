@@ -54,3 +54,14 @@ src/
 - `main.rs` exposes the CLI without owning parsing or rendering logic.
 
 The precise crate boundaries will continue to evolve incrementally before the first working `0.1.0` release.
+
+## Architectural boundary
+
+Codexa is a structured-content compiler, not a complete publishing platform.
+
+It owns the path from configured Git repositories to typed, validated,
+deterministic artifacts. Website rendering, media pipelines, commerce,
+authentication, deployment, and other application-specific behavior belong to
+downstream consumers or specialized producers.
+
+See [scope.md](scope.md) for the complete boundary and feature decision test.

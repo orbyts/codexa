@@ -846,3 +846,14 @@ Add target-specific projections without changing Git-backed canonical content.
 
 Notion and other hosted platforms remain generated destinations. They do not become canonical authoring stores unless a future, separately designed import workflow explicitly supports that behavior.
 
+
+## Scope guardrail
+
+Every milestone must remain within the boundary defined in
+[scope.md](scope.md).
+
+Codexa may discover, parse, validate, resolve, index, relate, and serialize
+structured repository content. It may emit stable artifacts for downstream
+consumers. It must not absorb website rendering, photography processing,
+commerce, authentication, deployment-provider integration, or unrelated
+specialized build pipelines.

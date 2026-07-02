@@ -54,6 +54,15 @@ This allows content to be written and updated once, while Codexa handles aggrega
 - Static generation is the default, but dynamic components can be added where needed.
 - Presentation, themes, JavaScript, commerce, and authentication remain separate from canonical content.
 
+## Scope
+
+Codexa is deliberately limited to discovering, parsing, validating, resolving,
+and serializing structured content from Git repositories. It does not own
+website rendering, media processing, commerce, authentication, or deployment.
+
+See [docs/scope.md](docs/scope.md) for the complete architectural boundary and
+the decision test for future features.
+
 ## Version policy
 
 - `0.0.1` through `0.0.9`: internal pre-release development
