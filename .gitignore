@@ -8,3 +8,6 @@
 .idea/
 .vscode/
 coverage/
+
+# Generated artifacts
+dist/
