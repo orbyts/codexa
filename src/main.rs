@@ -37,6 +37,27 @@ fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
         {
             build_web(PathBuf::from(input), PathBuf::from(output))
         }
+        [
+            command,
+            input,
+            output_flag,
+            output,
+            repository_flag,
+            repository,
+            source_path_flag,
+            source_path,
+        ] if command == "build-notion"
+            && output_flag == "--output"
+            && repository_flag == "--repository"
+            && source_path_flag == "--source-path" =>
+        {
+            build_notion(
+                PathBuf::from(input),
+                PathBuf::from(output),
+                repository,
+                source_path,
+            )
+        }
         _ => {
             print_help();
             Err("invalid arguments".into())
@@ -57,9 +78,23 @@ fn build_web(input: PathBuf, output: PathBuf) -> Result<(), Box<dyn std::error::
     Ok(())
 }
 
+fn build_notion(
+    input: PathBuf,
+    output: PathBuf,
+    repository: &str,
+    source_path: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let markdown = fs::read_to_string(&input)?;
+
+    codexa::adapter::notion::write_artifact(&markdown, repository, source_path, &output)?;
+
+    println!("Notion artifact written to {}", output.display());
+    Ok(())
+}
+
 fn print_help() {
     println!(
-        "Codexa {}\n\nA Git-native content compiler.\n\nUSAGE:\n    codexa [OPTIONS]\n    codexa build <INPUT> [--adapter web] --output <DIR>\n\nOPTIONS:\n    -h, --help       Print help\n    -V, --version    Print version",
+        "Codexa {}\n\nA Git-native content compiler.\n\nUSAGE:\n    codexa [OPTIONS]\n    codexa build <INPUT> [--adapter web] --output <DIR>\n    codexa build-notion <INPUT> --output <DIR> --repository <OWNER/REPO> --source-path <PATH>\n\nOPTIONS:\n    -h, --help       Print help\n    -V, --version    Print version",
         codexa::VERSION
     );
 }
