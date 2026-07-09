@@ -1,16 +1,17 @@
 ---
+schema: codexa.document@1
 id: workflows.playbooks.lureva-lightroom-handoff
 title: Lureva Lightroom Handoff Manual
+description: Daily Lightroom Classic handoff workflow for switching between quasar and eclipse during the Lureva 960 review.
 kind: playbook
 status: active
 visibility: private
 
-summary: Daily Lightroom Classic handoff workflow for switching between quasar and eclipse during the Lureva 960 review.
-
-source:
-  owner: archivora
-  repo: knowledge
-  path: workflows/playbooks/lureva-lightroom-handoff.md
+tags:
+  - lureva
+  - lightroom
+  - nazariya
+  - runbook
 
 distribution:
   notion: true
@@ -18,28 +19,7 @@ distribution:
 
 notion:
   workspace: codexa
-  database: knowledge
   data_source: documents
-  section: Workflows
-  collection: Playbooks
-
-topics:
-  - lureva
-  - lightroom
-  - nazariya
-  - proetus
-  - workflow
-  - runbook
-
-systems:
-  - quasar
-  - eclipse
-  - whisk
-
-projects:
-  - lureva
-  - nazariya
-  - proetus
 ---
 
 
