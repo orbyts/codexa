@@ -13,10 +13,14 @@ pub struct NotionPageArtifact {
     pub producer_version: String,
     /// Document metadata and source content.
     pub document: NotionDocument,
+    /// Shared tree/navigation placement.
+    pub navigation: NotionNavigation,
     /// Source provenance.
     pub source: NotionSource,
     /// Target placement metadata.
     pub target: NotionTarget,
+    /// Website placement metadata.
+    pub web: NotionWeb,
     /// Page content payload.
     pub content: NotionContent,
 }
@@ -34,6 +38,15 @@ pub struct NotionDocument {
     pub tags: Vec<String>,
 }
 
+/// Shared navigation/tree placement.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct NotionNavigation {
+    pub root: String,
+    pub product: String,
+    pub section: Option<String>,
+    pub order: Option<i64>,
+}
+
 /// Source provenance.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NotionSource {
@@ -48,6 +61,13 @@ pub struct NotionSource {
 pub struct NotionTarget {
     pub workspace: String,
     pub data_source: String,
+}
+
+/// Website placement target.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct NotionWeb {
+    pub collection: String,
+    pub slug: String,
 }
 
 /// Page content.
@@ -68,6 +88,8 @@ impl NotionPageArtifact {
         content_hash: impl Into<String>,
     ) -> Self {
         let metadata = source_document.metadata;
+        let navigation = metadata.resolved_navigation();
+        let web = metadata.resolved_web();
         let notion = metadata
             .notion
             .clone()
@@ -87,6 +109,12 @@ impl NotionPageArtifact {
                 visibility: metadata.visibility,
                 tags: metadata.tags,
             },
+            navigation: NotionNavigation {
+                root: navigation.root,
+                product: navigation.product,
+                section: navigation.section,
+                order: navigation.order,
+            },
             source: NotionSource {
                 repository: repository.into(),
                 path: source_path.into(),
@@ -96,6 +124,10 @@ impl NotionPageArtifact {
             target: NotionTarget {
                 workspace: notion.workspace,
                 data_source: notion.data_source,
+            },
+            web: NotionWeb {
+                collection: web.collection,
+                slug: web.slug,
             },
             content: NotionContent {
                 format: "markdown".into(),

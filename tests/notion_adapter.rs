@@ -19,17 +19,22 @@ fn writes_notion_artifact_for_runbook() {
         fs::read_to_string(temp.path().join("manifest.json")).expect("manifest should exist");
 
     assert!(manifest.contains("codexa.notion.manifest@1"));
-    assert!(manifest.contains("workflows.playbooks.lureva-lightroom-handoff"));
+    assert!(manifest.contains("lureva.playbooks.lightroom-handoff"));
 
     let page = fs::read_to_string(
         temp.path()
-            .join("pages/workflows.playbooks.lureva-lightroom-handoff.json"),
+            .join("pages/lureva.playbooks.lightroom-handoff.json"),
     )
     .expect("page artifact should exist");
 
     assert!(page.contains("codexa.notion.page@1"));
     assert!(page.contains("Lureva Lightroom Handoff Manual"));
     assert!(page.contains("\"description\""));
+    assert!(page.contains("\"navigation\""));
+    assert!(page.contains("\"root\": \"knowledge\""));
+    assert!(page.contains("\"product\": \"lureva\""));
+    assert!(page.contains("\"web\""));
+    assert!(page.contains("\"slug\": \"/knowledge/lureva/playbooks/lightroom-handoff\""));
     assert!(page.contains("\"data_source\": \"documents\""));
     assert!(page.contains("# Lureva Lightroom Workflow Manual"));
 }

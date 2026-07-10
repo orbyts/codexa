@@ -6,10 +6,7 @@ fn parses_lureva_runbook_contract() {
     let document = parse_source_document(source).expect("runbook fixture should parse");
 
     assert_eq!(document.metadata.schema, "codexa.document@1");
-    assert_eq!(
-        document.metadata.id,
-        "workflows.playbooks.lureva-lightroom-handoff"
-    );
+    assert_eq!(document.metadata.id, "lureva.playbooks.lightroom-handoff");
     assert_eq!(document.metadata.title, "Lureva Lightroom Handoff Manual");
     assert_eq!(document.metadata.kind, "playbook");
     assert_eq!(document.metadata.status, "active");
@@ -24,6 +21,25 @@ fn parses_lureva_runbook_contract() {
     );
     assert!(document.metadata.distribution.notion);
     assert_eq!(document.metadata.distribution.web, "private");
+
+    let navigation = document
+        .metadata
+        .navigation
+        .as_ref()
+        .expect("navigation should exist");
+
+    assert_eq!(navigation.root, "knowledge");
+    assert_eq!(navigation.product, "lureva");
+    assert_eq!(navigation.section.as_deref(), Some("Playbooks"));
+    assert_eq!(navigation.order, Some(10));
+
+    let web = document
+        .metadata
+        .web
+        .as_ref()
+        .expect("web target should exist");
+    assert_eq!(web.collection, "knowledge");
+    assert_eq!(web.slug, "/knowledge/lureva/playbooks/lightroom-handoff");
 
     let notion = document
         .metadata
