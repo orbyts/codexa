@@ -11,3 +11,6 @@ coverage/
 
 # Generated artifacts
 dist/
+
+# Codexa generated artifacts
+/dist/
