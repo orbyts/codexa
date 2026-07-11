@@ -15,7 +15,7 @@ navigation:
   root: docs
   product: codexa
   section: Reference
-  order: 20
+  order: 200
 distribution:
   notion: true
   web: public
@@ -48,7 +48,7 @@ navigation:
   root: docs
   product: codexa
   section: Guides
-  order: 10
+  order: 100
 distribution:
   notion: true
   web: public

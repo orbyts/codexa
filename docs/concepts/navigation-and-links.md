@@ -15,7 +15,7 @@ navigation:
   root: docs
   product: codexa
   section: Concepts
-  order: 30
+  order: 300
 distribution:
   notion: true
   web: public
@@ -39,7 +39,7 @@ navigation:
   root: docs
   product: codexa
   section: Concepts
-  order: 30
+  order: 300
 ```
 
 The same values can drive:
