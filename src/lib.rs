@@ -4,6 +4,7 @@
 //! target-neutral model and renders that model through output adapters.
 
 pub mod adapter;
+pub mod compiler;
 pub mod model;
 pub mod parser;
 

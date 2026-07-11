@@ -69,7 +69,7 @@ mod tests {
     #[test]
     fn parses_frontmatter_and_body() {
         let source = r#"---
-schema: codexa.document@1
+schema: codexa.document@2
 id: notes.example
 title: Example
 description: One line.
@@ -86,11 +86,10 @@ navigation:
 distribution:
   notion: true
   web: private
+  obsidian: true
 notion:
   workspace: codexa
-  data_source: documents
 web:
-  collection: docs
   slug: /docs/codexa/guides/example
 ---
 
@@ -101,18 +100,17 @@ Body text.
 
         let document = parse_source_document(source).expect("source document should parse");
 
-        assert_eq!(document.metadata.schema, "codexa.document@1");
+        assert_eq!(document.metadata.schema, "codexa.document@2");
         assert_eq!(document.metadata.id, "notes.example");
         assert_eq!(document.metadata.title, "Example");
         assert_eq!(document.metadata.description, "One line.");
         assert_eq!(document.metadata.tags, vec!["test"]);
 
-        let navigation = document.metadata.navigation.as_ref().unwrap();
+        let navigation = &document.metadata.navigation;
         assert_eq!(navigation.root, "docs");
         assert_eq!(navigation.product, "codexa");
 
         let web = document.metadata.web.as_ref().unwrap();
-        assert_eq!(web.collection, "docs");
         assert_eq!(web.slug, "/docs/codexa/guides/example");
 
         assert!(document.body.starts_with("# Example"));
