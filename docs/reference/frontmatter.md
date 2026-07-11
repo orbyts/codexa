@@ -122,4 +122,3 @@ See [[codexa.concepts.navigation-and-links|Navigation and Links]] for resolution
 
 Before Codexa, Orbexa, and Loomara reach `0.1.0`, the three projects may move together through breaking contract changes. At `0.1.0`, the first public contract is frozen. Subsequent feature releases must account for compatibility and migration.
 
-This page is part of the Codexa documentation tree.
