@@ -2,7 +2,7 @@ use codexa::parser::parse_source_document;
 
 #[test]
 fn parses_lureva_runbook_contract() {
-    let source = include_str!("fixtures/runbooks/lureva-lightroom-handoff.md");
+    let source = include_str!("fixtures/runbooks/lureva-lightroom-handoff.fixture");
     let document = parse_source_document(source).expect("runbook fixture should parse");
 
     assert_eq!(document.metadata.schema, "codexa.document@2");
