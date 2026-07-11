@@ -9,6 +9,8 @@
 .vscode/
 coverage/
 
+examples/.DS_Store
+
 # Generated artifacts
 dist/
 
