@@ -1,26 +1,11 @@
 use std::{fs, process::Command};
 
 #[test]
-fn prints_hello_world() {
-    let output = Command::new(env!("CARGO_BIN_EXE_codexa"))
-        .output()
-        .expect("codexa binary should run");
-
-    assert!(output.status.success());
-    assert_eq!(
-        String::from_utf8_lossy(&output.stdout),
-        "Hello from Codexa!\n"
-    );
-    assert!(output.stderr.is_empty());
-}
-
-#[test]
 fn prints_version() {
     let output = Command::new(env!("CARGO_BIN_EXE_codexa"))
         .arg("--version")
         .output()
         .expect("codexa binary should run");
-
     assert!(output.status.success());
     assert_eq!(
         String::from_utf8_lossy(&output.stdout),
@@ -29,29 +14,60 @@ fn prints_version() {
 }
 
 #[test]
-fn builds_a_web_artifact() {
-    let temp = tempfile::tempdir().expect("temporary directory should be created");
-    let input = temp.path().join("sample.md");
-    let output_dir = temp.path().join("web");
-    fs::write(&input, "Hello from Codexa web.\n").expect("fixture should be written");
+fn validates_and_builds_repository_bundle() {
+    let temp = tempfile::tempdir().unwrap();
+    let repo = temp.path().join("repo");
+    let docs = repo.join("docs");
+    fs::create_dir_all(&docs).unwrap();
+    fs::write(
+        docs.join("index.md"),
+        r#"---
+schema: codexa.document@2
+id: sample.index
+title: Sample
+description: Sample document.
+kind: guide
+status: active
+visibility: public
+tags: [sample]
+navigation:
+  root: docs
+  product: sample
+  section: Guides
+  order: 10
+distribution:
+  notion: true
+  web: public
+  obsidian: true
+notion:
+  workspace: codexa
+web:
+  slug: /docs/sample
+---
+# Sample
+"#,
+    )
+    .unwrap();
+    let output_dir = temp.path().join("dist");
 
     let output = Command::new(env!("CARGO_BIN_EXE_codexa"))
         .args([
             "build",
-            input.to_str().expect("input path should be UTF-8"),
-            "--adapter",
-            "web",
+            "--source-root",
+            repo.to_str().unwrap(),
+            "example/sample",
             "--output",
-            output_dir.to_str().expect("output path should be UTF-8"),
+            output_dir.to_str().unwrap(),
         ])
         .output()
-        .expect("codexa binary should run");
+        .unwrap();
 
     assert!(
         output.status.success(),
         "{}",
         String::from_utf8_lossy(&output.stderr)
     );
-    assert!(output_dir.join("manifest.json").is_file());
-    assert!(output_dir.join("documents/sample.json").is_file());
+    assert!(output_dir.join("bundle.json").is_file());
+    assert!(output_dir.join("notion/manifest.json").is_file());
+    assert!(output_dir.join("web/manifest.json").is_file());
 }

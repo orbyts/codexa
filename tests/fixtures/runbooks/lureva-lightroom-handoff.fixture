@@ -1,5 +1,5 @@
 ---
-schema: codexa.document@1
+schema: codexa.document@2
 id: lureva.playbooks.lightroom-handoff
 title: Lureva Lightroom Handoff Manual
 description: Daily Lightroom Classic handoff workflow for switching between quasar and eclipse during the Lureva 960 review.
@@ -22,13 +22,12 @@ navigation:
 distribution:
   notion: true
   web: private
+  obsidian: true
 
 notion:
   workspace: codexa
-  data_source: documents
 
 web:
-  collection: knowledge
   slug: /knowledge/lureva/playbooks/lightroom-handoff
 ---
 

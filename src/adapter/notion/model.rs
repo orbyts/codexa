@@ -1,31 +1,21 @@
 use serde::{Deserialize, Serialize};
 
-use crate::model::SourceDocument;
+use crate::{compiler::CompiledDocument, model::DocumentLink};
 
-/// Versioned JSON artifact consumed by Orbexa.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NotionPageArtifact {
-    /// Artifact schema version.
     pub schema: String,
-    /// Artifact producer.
     pub producer: String,
-    /// Producer package version.
     pub producer_version: String,
-    /// Document metadata and source content.
     pub document: NotionDocument,
-    /// Shared tree/navigation placement.
     pub navigation: NotionNavigation,
-    /// Source provenance.
     pub source: NotionSource,
-    /// Target placement metadata.
     pub target: NotionTarget,
-    /// Website placement metadata.
-    pub web: NotionWeb,
-    /// Page content payload.
+    pub web: Option<NotionWeb>,
+    pub links: Vec<DocumentLink>,
     pub content: NotionContent,
 }
 
-/// User-facing document metadata for downstream targets.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NotionDocument {
     pub schema: String,
@@ -38,16 +28,14 @@ pub struct NotionDocument {
     pub tags: Vec<String>,
 }
 
-/// Shared navigation/tree placement.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NotionNavigation {
     pub root: String,
     pub product: String,
-    pub section: Option<String>,
-    pub order: Option<i64>,
+    pub section: String,
+    pub order: i64,
 }
 
-/// Source provenance.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NotionSource {
     pub repository: String,
@@ -56,21 +44,17 @@ pub struct NotionSource {
     pub content_hash: String,
 }
 
-/// Notion placement target.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NotionTarget {
     pub workspace: String,
-    pub data_source: String,
+    pub root: String,
 }
 
-/// Website placement target.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NotionWeb {
-    pub collection: String,
     pub slug: String,
 }
 
-/// Page content.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NotionContent {
     pub format: String,
@@ -78,66 +62,56 @@ pub struct NotionContent {
 }
 
 impl NotionPageArtifact {
-    /// Builds a page artifact from a parsed source document.
     #[must_use]
-    pub fn new(
-        source_document: SourceDocument,
-        repository: impl Into<String>,
-        source_path: impl Into<String>,
-        commit: impl Into<String>,
-        content_hash: impl Into<String>,
-    ) -> Self {
-        let metadata = source_document.metadata;
-        let navigation = metadata.resolved_navigation();
-        let web = metadata.resolved_web();
+    pub fn new(compiled: &CompiledDocument) -> Self {
+        let metadata = &compiled.source.metadata;
         let notion = metadata
             .notion
-            .clone()
-            .expect("notion artifact requires notion target metadata");
+            .as_ref()
+            .expect("notion artifact requires notion target");
 
         Self {
-            schema: "codexa.notion.page@1".into(),
+            schema: "codexa.notion.page@2".into(),
             producer: "codexa".into(),
             producer_version: crate::VERSION.into(),
             document: NotionDocument {
-                schema: metadata.schema,
-                id: metadata.id,
-                title: metadata.title,
-                description: metadata.description,
-                kind: metadata.kind,
-                status: metadata.status,
-                visibility: metadata.visibility,
-                tags: metadata.tags,
+                schema: metadata.schema.clone(),
+                id: metadata.id.clone(),
+                title: metadata.title.clone(),
+                description: metadata.description.clone(),
+                kind: metadata.kind.clone(),
+                status: metadata.status.clone(),
+                visibility: metadata.visibility.clone(),
+                tags: metadata.tags.clone(),
             },
             navigation: NotionNavigation {
-                root: navigation.root,
-                product: navigation.product,
-                section: navigation.section,
-                order: navigation.order,
+                root: metadata.navigation.root.clone(),
+                product: metadata.navigation.product.clone(),
+                section: metadata.navigation.section.clone(),
+                order: metadata.navigation.order,
             },
             source: NotionSource {
-                repository: repository.into(),
-                path: source_path.into(),
-                commit: commit.into(),
-                content_hash: content_hash.into(),
+                repository: compiled.repository.clone(),
+                path: compiled.source_path.clone(),
+                commit: compiled.commit.clone(),
+                content_hash: compiled.content_hash.clone(),
             },
             target: NotionTarget {
-                workspace: notion.workspace,
-                data_source: notion.data_source,
+                workspace: notion.workspace.clone(),
+                root: metadata.navigation.root.clone(),
             },
-            web: NotionWeb {
-                collection: web.collection,
-                slug: web.slug,
-            },
+            web: metadata.web.as_ref().map(|web| NotionWeb {
+                slug: web.slug.clone(),
+            }),
+            links: compiled.links.clone(),
             content: NotionContent {
                 format: "markdown".into(),
-                markdown: source_document.body,
+                markdown: compiled.source.body.clone(),
             },
         }
     }
 }
 
-/// Manifest describing a Codexa Notion artifact bundle.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NotionManifest {
     pub schema: String,
@@ -146,25 +120,9 @@ pub struct NotionManifest {
     pub pages: Vec<NotionManifestPage>,
 }
 
-/// One page entry in a Notion artifact manifest.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NotionManifestPage {
     pub document_id: String,
+    pub root: String,
     pub path: String,
-}
-
-impl NotionManifest {
-    /// Creates a manifest for a single page artifact.
-    #[must_use]
-    pub fn single(document_id: impl Into<String>, path: impl Into<String>) -> Self {
-        Self {
-            schema: "codexa.notion.manifest@1".into(),
-            producer: "codexa".into(),
-            producer_version: crate::VERSION.into(),
-            pages: vec![NotionManifestPage {
-                document_id: document_id.into(),
-                path: path.into(),
-            }],
-        }
-    }
 }

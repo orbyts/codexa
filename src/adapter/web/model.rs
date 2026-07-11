@@ -1,52 +1,76 @@
 use serde::{Deserialize, Serialize};
 
-use crate::model::Document;
+use crate::{compiler::CompiledDocument, model::DocumentLink};
 
-/// Versioned JSON representation consumed by a web frontend.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct WebDocumentArtifact {
-    /// Serialized artifact schema.
+pub struct WebPageArtifact {
     pub schema: String,
-    /// Target-neutral Codexa document.
-    pub document: Document,
+    pub producer: String,
+    pub producer_version: String,
+    pub id: String,
+    pub title: String,
+    pub description: String,
+    pub kind: String,
+    pub status: String,
+    pub visibility: String,
+    pub tags: Vec<String>,
+    pub root: String,
+    pub product: String,
+    pub section: String,
+    pub order: i64,
+    pub slug: String,
+    pub links: Vec<DocumentLink>,
+    pub markdown: String,
+    pub source_repository: String,
+    pub source_path: String,
+    pub source_commit: String,
+    pub content_hash: String,
 }
 
-impl WebDocumentArtifact {
-    /// Creates a version 1 web document artifact.
-    #[must_use]
-    pub fn new(document: Document) -> Self {
+impl WebPageArtifact {
+    pub fn new(document: &CompiledDocument) -> Self {
+        let metadata = &document.source.metadata;
+        let web = metadata
+            .web
+            .as_ref()
+            .expect("web artifact requires web target");
         Self {
-            schema: "codexa.web/document@1".into(),
-            document,
+            schema: "codexa.web.page@1".into(),
+            producer: "codexa".into(),
+            producer_version: crate::VERSION.into(),
+            id: metadata.id.clone(),
+            title: metadata.title.clone(),
+            description: metadata.description.clone(),
+            kind: metadata.kind.clone(),
+            status: metadata.status.clone(),
+            visibility: metadata.visibility.clone(),
+            tags: metadata.tags.clone(),
+            root: metadata.navigation.root.clone(),
+            product: metadata.navigation.product.clone(),
+            section: metadata.navigation.section.clone(),
+            order: metadata.navigation.order,
+            slug: web.slug.clone(),
+            links: document.links.clone(),
+            markdown: document.source.body.clone(),
+            source_repository: document.repository.clone(),
+            source_path: document.source_path.clone(),
+            source_commit: document.commit.clone(),
+            content_hash: document.content_hash.clone(),
         }
     }
 }
 
-/// Manifest describing the generated web artifact bundle.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WebManifest {
-    /// Serialized manifest schema.
     pub schema: String,
-    /// Generator name.
-    pub generator: String,
-    /// Generator package version.
-    pub generator_version: String,
-    /// Relative document entry point.
-    pub entrypoint: String,
-    /// Original source filename.
-    pub source: String,
+    pub producer: String,
+    pub producer_version: String,
+    pub pages: Vec<WebManifestPage>,
 }
 
-impl WebManifest {
-    /// Creates a manifest for the initial single-document bundle.
-    #[must_use]
-    pub fn new(source: &str) -> Self {
-        Self {
-            schema: "codexa.web/manifest@1".into(),
-            generator: "codexa".into(),
-            generator_version: crate::VERSION.into(),
-            entrypoint: "documents/sample.json".into(),
-            source: source.into(),
-        }
-    }
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct WebManifestPage {
+    pub document_id: String,
+    pub slug: String,
+    pub path: String,
 }

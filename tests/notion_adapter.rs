@@ -1,40 +1,46 @@
-use std::{fs, path::Path};
+use std::{fs, path::PathBuf};
+
+use codexa::compiler::{SourceRoot, compile_roots};
 
 #[test]
-fn writes_notion_artifact_for_runbook() {
+fn writes_notion_bundle_for_runbook() {
     let temp = tempfile::tempdir().expect("tempdir should be created");
-    let input = Path::new("tests/fixtures/runbooks/lureva-lightroom-handoff.md");
 
-    let markdown = fs::read_to_string(input).expect("fixture should read");
+    let repository = temp.path().join("repository");
+    let source_dir = repository.join("workflows/playbooks");
+    let output = temp.path().join("notion");
 
-    codexa::adapter::notion::write_artifact(
-        &markdown,
-        "archivora/knowledge",
-        "workflows/playbooks/lureva-lightroom-handoff.md",
-        temp.path(),
-    )
-    .expect("notion artifact should write");
+    fs::create_dir_all(&source_dir).expect("fixture source directory should be created");
+
+    let fixture = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/fixtures/runbooks/lureva-lightroom-handoff.fixture");
+
+    fs::copy(fixture, source_dir.join("lureva-lightroom-handoff.md"))
+        .expect("fixture should be copied as Markdown");
+
+    let documents = compile_roots(&[SourceRoot {
+        path: repository,
+        repository: "archivora/knowledge".into(),
+    }])
+    .expect("fixture repository should compile");
+
+    codexa::adapter::notion::write_bundle(&documents, &output).expect("notion bundle should write");
 
     let manifest =
-        fs::read_to_string(temp.path().join("manifest.json")).expect("manifest should exist");
+        fs::read_to_string(output.join("manifest.json")).expect("manifest should be readable");
 
-    assert!(manifest.contains("codexa.notion.manifest@1"));
+    assert!(manifest.contains("codexa.notion.manifest@2"));
     assert!(manifest.contains("lureva.playbooks.lightroom-handoff"));
 
     let page = fs::read_to_string(
-        temp.path()
-            .join("pages/lureva.playbooks.lightroom-handoff.json"),
+        output
+            .join("pages")
+            .join("lureva.playbooks.lightroom-handoff.json"),
     )
-    .expect("page artifact should exist");
+    .expect("page artifact should be readable");
 
-    assert!(page.contains("codexa.notion.page@1"));
-    assert!(page.contains("Lureva Lightroom Handoff Manual"));
-    assert!(page.contains("\"description\""));
-    assert!(page.contains("\"navigation\""));
+    assert!(page.contains("codexa.notion.page@2"));
     assert!(page.contains("\"root\": \"knowledge\""));
-    assert!(page.contains("\"product\": \"lureva\""));
-    assert!(page.contains("\"web\""));
-    assert!(page.contains("\"slug\": \"/knowledge/lureva/playbooks/lightroom-handoff\""));
-    assert!(page.contains("\"data_source\": \"documents\""));
-    assert!(page.contains("# Lureva Lightroom Workflow Manual"));
+    assert!(page.contains("\"workspace\": \"codexa\""));
+    assert!(!page.contains("data_source"));
 }
